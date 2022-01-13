@@ -1,5 +1,5 @@
 
-//whitedevil  and saidali
+//dripsmemes  and saidali
 
 const Asena = require('../events');
 const config = require('../config');
