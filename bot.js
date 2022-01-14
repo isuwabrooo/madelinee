@@ -176,8 +176,6 @@ ${chalk.blue.italic('ℹ️ Connecting to WhatsApp...')}`);
           }
     });
    
-    }, 50000);
-
     conn.on('chat-update', async m => {
         if (!m.hasNewMessage) return;
         if (!m.messages && !m.count) return;
