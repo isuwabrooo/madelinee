@@ -1,4 +1,4 @@
-<a href="https://fontmeme.com/wavy-effect/"><img src="https://fontmeme.com/permalink/220116/61292576908d3ec6da7113e3b75e8055.png" alt="wavy-effect" border="0"></a>
+<img src="https://fontmeme.com/permalink/220116/61292576908d3ec6da7113e3b75e8055.png" alt="wavy-effect" border="0"></a>
 
 
 
@@ -42,26 +42,10 @@ Project created by <a href="https://github.com/zim-bot">DripsMemes</a> to make i
 
   
 [![Run on Repl.it](https://repl.it/badge/github/quiec/whatsAlfa)](https://replit.com/@ReinhardTuna/zim-bot?v=1)
-  
+<img src="https://fontmeme.com/permalink/220116/0c42dc0b64931810388ba399da55e927.png" alt="backwoods-logo-font" border="0"></a>  
 ### The Hard Method
-```js
-GET QR
-$ apt install git
-$ apt install nodejs --fix-missing
-$ git clone https://github.com/zim-bot/madelinee
-$ cd madelinee
-$ npm install @adiwajshing/baileys
-$ npm install chalk
-$ node Amalser.js
-```
-      
-```js
-SETUP
-$ git clone https://github.com/zim-bot/madelinee
-$ cd madelinee
-$ npm i
-$ node Amal_ser.js
-```
+
+
 
 ----
 
