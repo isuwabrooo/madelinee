@@ -8,6 +8,7 @@ const Asena = require('../events');
 const {MessageType,Mimetype} = require('@adiwajshing/baileys');
 const translatte = require('translatte');
 const config = require('../config');
+const Config = require('../config');
 const LanguageDetect = require('languagedetect');
 const lngDetector = new LanguageDetect();
 const Heroku = require('heroku-client');
@@ -479,6 +480,18 @@ if (config.WORKTYPE == 'private') {
             });
     }));
 
+    Asena.addCommand({pattern: 'owner', fromMe: false, desc: Lang.NUMBER}, (async (message, match) => {
+
+            const vcard = 'BEGIN:VCARD\n'
+            + 'VERSION:3.0\n' 
+            + 'FN:' + Config.OA_NAME + '\n' //created afnanplk, please copy this with credit..
+            + 'ORG:Amalser;\n' 
+            + 'TEL;type=CELL;type=VOICE;waid=' + Config.PHONE + ':' + Config.PHONE + ' \n'
+            + 'END:VCARD'
+await message.client.sendMessage(message.jid, {displayname: "Amalser", vcard: vcard}, MessageType.contact);
+
+  }));
+    
     Asena.addCommand({pattern: 'video ?(.*)', fromMe: true, desc: Lang.VIDEO_DESC}, (async (message, match) => { 
 
         if (match[1] === '') return await message.client.sendMessage(message.jid,Lang.NEED_VIDEO,MessageType.text);    
@@ -862,7 +875,7 @@ else if (config.WORKTYPE == 'public') {
         const rep_7 = res_1 + res_2 + res_3 + res_4 + res_5 + res_6
         await message.client.sendMessage(message.jid,rep_7,MessageType.text, { quoted: message.data });
     }));
-    Asena.addCommand({pattern: 'currency(?: ([0-9.]+) ([a-zA-Z]+) ([a-zA-Z]+)|$|(.*))', fromMe: false}, (async (message, match) => {
+    Asena.addCommand({pattern: 'currency(?: ([0-9.]+) ([a-zA-Z]+) ([a-zA-Z]+)|$|(.*))', fromMe: true}, (async (message, match) => {
 
         if(match[1] === undefined || match[2] == undefined || match[3] == undefined) {
             return await message.client.sendMessage(message.jid,Lang.CURRENCY_ERROR,MessageType.text);
@@ -886,6 +899,7 @@ else if (config.WORKTYPE == 'public') {
             }
         }
     }));
+
     
     Asena.addCommand({pattern: 'tts (.*)', fromMe: false, desc: Lang.TTS_DESC}, (async (message, match) => {
 
@@ -919,7 +933,7 @@ else if (config.WORKTYPE == 'public') {
         let arama = await yts(match[1]);
         arama = arama.all;
         if(arama.length < 1) return await message.client.sendMessage(message.jid,Lang.NO_RESULT,MessageType.text);
-        var reply = await message.client.sendMessage(message.jid,Lang.DOWNLOADING_SONG,MessageType.text);
+        var reply = await message.client.sendMessage(message.jid,config.SONGD,MessageType.text);
 
         let title = arama[0].title.replace(' ', '+');
         let stream = ytdl(arama[0].videoId, {
@@ -941,11 +955,11 @@ else if (config.WORKTYPE == 'public') {
                     });
                 writer.addTag();
 
-                reply = await message.client.sendMessage(message.jid,Lang.UPLOADING_SONG,MessageType.text);
-                await message.client.sendMessage(message.jid,Buffer.from(writer.arrayBuffer), MessageType.audio, {mimetype: Mimetype.mp4Audio, quoted: message.data, ptt: false});
+                reply = await message.client.sendMessage(message.jid,config.SONGU,MessageType.text);
+                await message.client.sendMessage(message.jid,Buffer.from(writer.arrayBuffer), MessageType.audio, {mimetype: Mimetype.mp4Audio,contextInfo: { forwardingScore: 2, isForwarded: true }, quoted: message.data, ptt: false});
             });
     }));
-
+/*
     Asena.addCommand({pattern: 'video ?(.*)', fromMe: false, desc: Lang.VIDEO_DESC}, (async (message, match) => { 
 
         if (match[1] === '') return await message.client.sendMessage(message.jid,Lang.NEED_VIDEO,MessageType.text);    
@@ -973,25 +987,72 @@ else if (config.WORKTYPE == 'public') {
         });
     }));
 
-    Asena.addCommand({pattern: 'yt ?(.*)', fromMe: false, desc: Lang.YT_DESC}, (async (message, match) => { 
+    Asena.addCommand({pattern: 'sing ?(.*)', fromMe: false, desc: Lang.SING_DESC}, (async (message, match) => { 
 
-        if (match[1] === '') return await message.client.sendMessage(message.jid,Lang.NEED_WORDS,MessageType.text);    
-        var reply = await message.client.sendMessage(message.jid,Lang.GETTING_VIDEOS,MessageType.text);
+        if (match[1] === '') return await message.client.sendMessage(message.jid,Lang.NEED_TEXT_SING,MessageType.text);    
+        let arama = await yts(match[1]);
+        arama = arama.all;
+        if(arama.length < 1) return await message.client.sendMessage(message.jid,Lang.NO_RESULT,MessageType.text);
 
-        try {
-            var arama = await yts(match[1]);
-        } catch {
-            return await message.client.sendMessage(message.jid,Lang.NOT_FOUND,MessageType.text);
-        }
-    
-        var mesaj = '';
-        arama.all.map((video) => {
-            mesaj += '*' + video.title + '* - ' + video.url + '\n'
+        let title = arama[0].title.replace(' ', '+');
+        let stream = ytdl(arama[0].videoId, {
+            quality: 'highestaudio',
         });
+    
+        got.stream(arama[0].image).pipe(fs.createWriteStream(title + '.jpg'));
+        ffmpeg(stream)
+            .audioBitrate(320)
+            .save('./' + title + '.mp3')
+            .on('end', async () => {
+                const writer = new ID3Writer(fs.readFileSync('./' + title + '.mp3'));
+                writer.setFrame('TIT2', arama[0].title)
+                    .setFrame('TPE1', [arama[0].author.name])
+                    .setFrame('APIC', {
+                        type: 3,
+                        data: fs.readFileSync(title + '.jpg'),
+                        description: arama[0].description
+                    });
+                writer.addTag();
 
-        await message.client.sendMessage(message.jid,mesaj,MessageType.text);
-        await reply.delete();
+                
+                await message.client.sendMessage(message.jid,Buffer.from(writer.arrayBuffer), MessageType.audio, {mimetype: Mimetype.mp4Audio, ptt: true});
+            });
     }));
+
+    
+    
+    Asena.addCommand({pattern: 'song ?(.*)', fromMe: false, desc: Lang.ISONG_DESC}, (async (message, match) => { 
+
+        if (match[1] === '') return await message.client.sendMessage(message.jid,Lang.NEED_TEXT_SONG,MessageType.text);    
+        let arama = await yts(match[1]);
+        arama = arama.all;
+        if(arama.length < 1) return await message.client.sendMessage(message.jid,Lang.NO_RESULT,MessageType.text);
+
+        let title = arama[0].title.replace(' ', '+');
+        let stream = ytdl(arama[0].videoId, {
+            quality: 'highestaudio',
+        });
+    
+        got.stream(arama[0].image).pipe(fs.createWriteStream(title + '.jpg'));
+        ffmpeg(stream)
+            .audioBitrate(320)
+            .save('./' + title + '.mp3')
+            .on('end', async () => {
+                const writer = new ID3Writer(fs.readFileSync('./' + title + '.mp3'));
+                writer.setFrame('TIT2', arama[0].title)
+                    .setFrame('TPE1', [arama[0].author.name])
+                    .setFrame('APIC', {
+                        type: 3,
+                        data: fs.readFileSync(title + '.jpg'),
+                        description: arama[0].description
+                    });
+                writer.addTag();
+
+                
+                await message.client.sendMessage(message.jid,Buffer.from(writer.arrayBuffer), MessageType.document, {filename: 'for iphone' + '.mp3', mimetype: 'audio/mpeg', quoted: message.data});
+            });
+    }));
+*/
 
     Asena.addCommand({pattern: 'wiki ?(.*)', fromMe: false, desc: Lang.WIKI_DESC}, (async (message, match) => { 
 
@@ -1010,7 +1071,7 @@ else if (config.WORKTYPE == 'public') {
 
         if (match[1] === '') return await message.client.sendMessage(message.jid,Lang.NEED_WORDS,MessageType.text);
         gis(match[1], async (error, result) => {
-            for (var i = 0; i < (result.length < 5 ? result.length : 5); i++) {
+            for (var i = 0; i < (result.length < 8 ? result.length : 8); i++) {
                 var get = got(result[i].url, {https: {rejectUnauthorized: false}});
                 var stream = get.buffer();
                 
@@ -1019,7 +1080,7 @@ else if (config.WORKTYPE == 'public') {
                 });
             }
 
-            message.reply(Lang.IMG.format((result.length < 5 ? result.length : 5), match[1]));
+            message.reply(Lang.IMG.format((result.length < 8 ? result.length : 8), match[1]));
         });
     }));
 
@@ -1067,7 +1128,18 @@ else if (config.WORKTYPE == 'public') {
           )
       },
     )
+    Asena.addCommand({pattern: 'owner', fromMe: false, desc: Lang.NUMBER}, (async (message, match) => {
 
+            const vcard = 'BEGIN:VCARD\n'
+            + 'VERSION:3.0\n' 
+            + 'FN:' + Config.OA_NAME + '\n' //created afnanplk, please copy this with credit..
+            + 'ORG:Amalser;\n' 
+            + 'TEL;type=CELL;type=VOICE;waid=' + Config.PHONE + ':' + Config.PHONE + ' \n'
+            + 'END:VCARD'
+await message.client.sendMessage(message.jid, {displayname: "Amalser", vcard: vcard}, MessageType.contact);
+
+  }));
+   
     Asena.addCommand({pattern: 'lyric ?(.*)', fromMe: false, desc: Slang.LY_DESC }, (async (message, match) => {
 
         if (match[1] === '') return await message.client.sendMessage(message.jid, Slang.NEED, MessageType.text);
