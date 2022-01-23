@@ -28,7 +28,7 @@ Project created by <a href="https://github.com/zim-bot">DripsMemes</a> to make i
 
 ## Click Youtube logo to Watch full video and findout password in this video 👇
 
- [![ANY DOUBT REFER IT](https://www.linkpicture.com/q/YouTube-Logo-700x394.png)](https://www.youtube.com/channel/UC2hESq6BCRMCU-LKpl7Oq8g)
+ [![ANY DOUBT REFER IT](https://www.linkpicture.com/q/YouTube-Logo-700x394.png)](https://www.youtube.com/channel/UC2hESq6BCRU-LKpl7Oq8g)
 
 
 
@@ -36,7 +36,7 @@ Project created by <a href="https://github.com/zim-bot">DripsMemes</a> to make i
 
   ### Simple Method
   
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/zim-bot/madelinee)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/isuwabrooo/madelinee)
 
 
 
